@@ -40,7 +40,7 @@ export const useAccountActions = (): AccountActions => {
 
   const deleteAccount = useCallback(async () => {
     const proceed = window.confirm(
-      "Are you sure you want to delete your account? This action is permanent and cannot be undone."
+      "Are you sure you want to delete your account? This action is permanent and cannot be undone. "
     );
     if (!proceed) return;
     
