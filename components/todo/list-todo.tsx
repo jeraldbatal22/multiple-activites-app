@@ -114,14 +114,17 @@ const ListTodo = () => {
               description: "Create your first todo to get started.",
             }}
             renderTitle={(item) => (
-              <div className="text-lg font-semibold text-slate-800">
-                {item.title}
+              <div className="text-xl text-slate-600 mt-1">
+                Priority Level: {item.priority_levels}
               </div>
             )}
             renderSubtitle={(item) => (
               <>
+                <div className="text-lg font-semibold text-slate-800">
+                  {item.title}
+                </div>
                 <div className="text-sm text-slate-600 mt-1">
-                  {item.description}
+                  {item.priority_levels}
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
                   Created:{" "}

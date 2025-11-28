@@ -15,14 +15,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 // shadcn
-import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 // Validation schema
 const todoSchema = z.object({
   title: z.string().min(1, "Title is required").max(128, "Max 128 characters"),
-  description: z.string().min(1, "Description is required").max(800, "Max 800 characters"),
+  priorityLevel: z.enum(["low", "medium", "high"]).optional(),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(800, "Max 800 characters"),
 });
 
 type TodoValues = z.infer<typeof todoSchema>;
@@ -40,6 +51,7 @@ const FormTodo = () => {
     defaultValues: {
       title: selectedTodo?.title || "",
       description: selectedTodo?.description || "",
+      priorityLevel: selectedTodo?.priorityLevel || "",
     },
   });
 
@@ -66,6 +78,7 @@ const FormTodo = () => {
 
   const onSubmit = async (values: TodoValues) => {
     setIsLoading(true);
+
     try {
       const supabase = supabaseClient();
 
@@ -73,7 +86,11 @@ const FormTodo = () => {
         // Update existing todo
         const { error } = await supabase
           .from("todos")
-          .update({ title: values.title.trim(), description: values.description.trim() })
+          .update({
+            title: values.title.trim(),
+            description: values.description.trim(),
+            priority_levels: values.priorityLevel,
+          })
           .eq("id", selectedTodo.id);
 
         if (error) throw new Error(error.message);
@@ -86,6 +103,7 @@ const FormTodo = () => {
           title: values.title.trim(),
           description: values.description.trim(),
           user_id: user?.id,
+          priority_levels: values.priorityLevel,
         });
 
         if (error) throw new Error(error.message);
@@ -116,7 +134,31 @@ const FormTodo = () => {
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col gap-4 rounded-3xl border border-slate-100 bg-linear-to-b from-slate-50 to-white/80 p-5 shadow-[0_18px_55px_-45px_rgba(15,23,42,0.6)]"
             >
+              <FormField
+                control={form.control}
+                name="title"
+                render={() => (
+                  <FormItem>
+                    <FormLabel htmlFor="todo-title">Priority Level</FormLabel>
+                    <FormControl>
+                      <select
+                        // {...field}
+                        onChange={(e) =>
+                          form.setValue("priorityLevel", e.target.value as any)
+                        }
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Meidum</option>
+                        <option value="high">High</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Title Field */}
+
               <FormField
                 control={form.control}
                 name="title"
@@ -144,7 +186,9 @@ const FormTodo = () => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="todo-description">Description</FormLabel>
+                    <FormLabel htmlFor="todo-description">
+                      Description
+                    </FormLabel>
                     <FormControl>
                       <Textarea
                         id="todo-description"
