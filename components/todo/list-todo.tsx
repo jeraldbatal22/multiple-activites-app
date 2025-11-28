@@ -124,7 +124,7 @@ const ListTodo = () => {
                   {item.title}
                 </div>
                 <div className="text-sm text-slate-600 mt-1">
-                  {item.priority_levels}
+                  {item.description}
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
                   Created:{" "}

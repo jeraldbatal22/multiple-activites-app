@@ -29,7 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 // Validation schema
 const todoSchema = z.object({
   title: z.string().min(1, "Title is required").max(128, "Max 128 characters"),
-  priorityLevel: z.enum(["low", "medium", "high"]).optional(),
+  priorityLevel: z.enum(["low", "medium", "high"]),
   description: z
     .string()
     .min(1, "Description is required")
@@ -51,7 +51,7 @@ const FormTodo = () => {
     defaultValues: {
       title: selectedTodo?.title || "",
       description: selectedTodo?.description || "",
-      priorityLevel: selectedTodo?.priorityLevel || "",
+      priorityLevel: selectedTodo?.priority_levels || "low",
     },
   });
 
@@ -61,11 +61,13 @@ const FormTodo = () => {
       form.reset({
         title: selectedTodo.title || "",
         description: selectedTodo.description || "",
+        priorityLevel: selectedTodo.priority_levels || "",
       });
     } else {
       form.reset({
         title: "",
         description: "",
+        priorityLevel: "low",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,7 +80,6 @@ const FormTodo = () => {
 
   const onSubmit = async (values: TodoValues) => {
     setIsLoading(true);
-
     try {
       const supabase = supabaseClient();
 
@@ -136,19 +137,22 @@ const FormTodo = () => {
             >
               <FormField
                 control={form.control}
-                name="title"
-                render={() => (
+                name="priorityLevel"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="todo-title">Priority Level</FormLabel>
+                    <FormLabel htmlFor="todo-priority">
+                      Priority Level
+                    </FormLabel>
                     <FormControl>
                       <select
-                        // {...field}
-                        onChange={(e) =>
-                          form.setValue("priorityLevel", e.target.value as any)
+                        id="todo-priority"
+                        {...field}
+                        value={
+                          field.value || selectedTodo?.priority_levels || "low"
                         }
                       >
                         <option value="low">Low</option>
-                        <option value="medium">Meidum</option>
+                        <option value="medium">Medium</option>
                         <option value="high">High</option>
                       </select>
                     </FormControl>
